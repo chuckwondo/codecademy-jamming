@@ -1,6 +1,6 @@
 import {join} from "ramda";
 
-const clientId = "6a2043d949004137b05cb9deb14df12a";
+const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const redirectUri = "http://localhost:3000/";
 let authorization = [];
 
@@ -66,22 +66,23 @@ const getAuthorization = () => {
       .then(setAuthorization, authorize);
 };
 
-const getRequestHeaders = () => getAuthorization()
-  .then(([type, token]) => ({
+const getRequestHeaders = () =>
+  getAuthorization().then(([type, token]) => ({
     Accept: "application/json",
     Authorization: `${type} ${token}`,
     "Content-Type": "application/json",
   }));
 
-const toJsonOrReject = (rejectReason) => (response) => {
-  const errorMessage = (json) =>
-    json["error_description"] || json["error"]["message"] || "Unknown error";
+const toJsonOrReject = (rejectReason) =>
+  (response) => {
+    const errorMessage = (json) =>
+      json["error_description"] || json["error"]["message"] || "Unknown error";
 
-  return response.json()
-    .then(json => response.ok
-      ? Promise.resolve(json)
-      : Promise.reject(`${rejectReason}: ${errorMessage(json)}`));
-};
+    return response.json()
+      .then(json => response.ok
+        ? Promise.resolve(json)
+        : Promise.reject(`${rejectReason}: ${errorMessage(json)}`));
+  };
 
 const Spotify = {
   endpoints: {
